@@ -1,7 +1,7 @@
 import { TeacherService } from './teacher.service';
 import { Teacher } from '../interfaces/teacher.interface';
 import { HttpClient } from '@angular/common/http';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 // Mock HttpClient for Jest
 const httpClientMock = {

@@ -1,9 +1,14 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../tsconfig.json", // Hérite de la configuration racine
   "compilerOptions": {
-    "isolatedModules": false
+    "outDir": "../dist/out-tsc/cypress", // Répertoire de sortie distinct (optionnel, mais bonne pratique)
+    "types": ["cypress", "node"], // Inclut spécifiquement les types Cypress et Node
+    "isolatedModules": false, // Cypress peut nécessiter cela
+    "noEmit": true // On ne compile pas réellement les tests Cypress via tsc ici
   },
   "include": [
-    "../node_modules/cypress"
+    "../node_modules/cypress", 
+    "**/*.ts" // Inclut tous les fichiers .ts dans le dossier cypress et ses sous-dossiers
   ]
+  // "exclude" n'est généralement pas nécessaire ici si 'include' est bien défini
 }
