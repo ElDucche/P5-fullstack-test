@@ -1,54 +1,93 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TeacherService } from './teacher.service';
 import { Teacher } from '../interfaces/teacher.interface';
-import {expect} from '@jest/global'
+import { HttpClient } from '@angular/common/http';
+import { of } from 'rxjs';
 
-describe('TeacherService', () => {
+// Mock HttpClient for Jest
+const httpClientMock = {
+  get: jest.fn()
+};
+
+describe('TeacherService (Jest)', () => {
   let service: TeacherService;
-  let httpMock: HttpTestingController;
+  let httpClient: jest.Mocked<HttpClient>;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [TeacherService],
+    httpClientMock.get.mockClear(); // Clear previous calls to the mock
+    service = new TeacherService(httpClientMock as unknown as HttpClient);
+    httpClient = httpClientMock as unknown as jest.Mocked<HttpClient>;
     });
-    service = TestBed.inject(TeacherService);
-    httpMock = TestBed.inject(HttpTestingController);
-  });
-
-  afterEach(() => {
-    httpMock.verify();
-  });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should fetch all teachers', () => {
+  it('should fetch all teachers', (done) => {
     const mockTeachers: Teacher[] = [
-      { id: '1', name: 'Teacher 1', subject: 'Math' },
-      { id: '2', name: 'Teacher 2', subject: 'Science' },
+      { id: 1, lastName: 'Doe', firstName: 'John', createdAt: new Date(), updatedAt: new Date() },
+      { id: 2, lastName: 'Smith', firstName: 'Jane', createdAt: new Date(), updatedAt: new Date() },
     ];
+    // Configure the mock response
+    httpClient.get.mockReturnValue(of(mockTeachers));
 
     service.all().subscribe((teachers) => {
       expect(teachers).toEqual(mockTeachers);
+      // Verify the mock was called correctly
+      expect(httpClient.get).toHaveBeenCalledWith('api/teacher');
+      expect(httpClient.get).toHaveBeenCalledTimes(1);
+      done(); // Signal async test completion
     });
-
-    const req = httpMock.expectOne('api/teacher');
-    expect(req.request.method).toBe('GET');
-    req.flush(mockTeachers);
   });
 
-  it('should fetch teacher details by ID', () => {
-    const mockTeacher: Teacher = { id: '1', name: 'Teacher 1', subject: 'Math' };
+  it('should fetch teacher details by ID', (done) => {
+    const teacherId = '1';
+    // Assuming Teacher interface has id as number, adjust mock accordingly
+    const mockTeacher: Teacher = { id: 1, lastName: 'Doe', firstName: 'John', createdAt: new Date(), updatedAt: new Date() };
 
-    service.detail('1').subscribe((teacher) => {
+    // Configure the mock response
+    httpClient.get.mockReturnValue(of(mockTeacher));
+
+    service.detail(teacherId).subscribe((teacher) => {
       expect(teacher).toEqual(mockTeacher);
+      // Verify the mock was called correctly
+      expect(httpClient.get).toHaveBeenCalledWith(`api/teacher/${teacherId}`);
+      expect(httpClient.get).toHaveBeenCalledTimes(1);
+      done(); // Signal async test completion
     });
+  });
 
-    const req = httpMock.expectOne('api/teacher/1');
-    expect(req.request.method).toBe('GET');
-    req.flush(mockTeacher);
+  // Example of an additional test: Error handling for 'all'
+  it('should handle error when fetching all teachers', (done) => {
+    const errorResponse = new Error('Failed to fetch');
+    // Configure the mock to return an error
+    httpClient.get.mockReturnValue(throwError(() => errorResponse));
+
+    service.all().subscribe({
+        next: () => fail('should have failed with an error'), // Fail test if next is called
+        error: (error) => {
+            expect(error).toBe(errorResponse);
+            expect(httpClient.get).toHaveBeenCalledWith('api/teacher');
+            expect(httpClient.get).toHaveBeenCalledTimes(1);
+            done(); // Signal async test completion
+        }
+    });
+  });
+
+    // Example of an additional test: Error handling for 'detail'
+  it('should handle error when fetching teacher details by ID', (done) => {
+    const teacherId = '1';
+    const errorResponse = new Error('Teacher not found');
+     // Configure the mock to return an error
+    httpClient.get.mockReturnValue(throwError(() => errorResponse));
+
+    service.detail(teacherId).subscribe({
+        next: () => fail('should have failed with an error'), // Fail test if next is called
+        error: (error) => {
+            expect(error).toBe(errorResponse);
+            expect(httpClient.get).toHaveBeenCalledWith(`api/teacher/${teacherId}`);
+            expect(httpClient.get).toHaveBeenCalledTimes(1);
+            done(); // Signal async test completion
+        }
+    });
   });
 });

@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+// jest
 import { SessionService } from './session.service';
 import { SessionInformation } from '../interfaces/sessionInformation.interface';
 
@@ -15,7 +15,7 @@ describe('SessionService', () => {
   });
 
   it('should initialize with isLogged as false', () => {
-    expect(service.isLogged).toBeFalse();
+    expect(service.isLogged).toBeFalsy();
   });
 
   it('should emit the initial isLogged value as false', (done) => {
