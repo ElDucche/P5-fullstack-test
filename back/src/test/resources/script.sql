@@ -1,4 +1,4 @@
-CREATE TABLE `TEACHERS` (
+CREATE TABLE IF NOT EXISTS `TEACHERS` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `last_name` VARCHAR(40),
   `first_name` VARCHAR(40),
@@ -6,7 +6,7 @@ CREATE TABLE `TEACHERS` (
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `SESSIONS` (
+CREATE TABLE IF NOT EXISTS `SESSIONS` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `name` VARCHAR(50),
   `description` VARCHAR(2000),
@@ -16,7 +16,7 @@ CREATE TABLE `SESSIONS` (
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `USERS` (
+CREATE TABLE IF NOT EXISTS `USERS` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `last_name` VARCHAR(40),
   `first_name` VARCHAR(40),
@@ -27,7 +27,7 @@ CREATE TABLE `USERS` (
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `PARTICIPATE` (
+CREATE TABLE IF NOT EXISTS `PARTICIPATE` (
   `user_id` INT, 
   `session_id` INT
 );
@@ -42,5 +42,5 @@ VALUES ('Margot', 'DELAHAYE'),
 
 
 INSERT INTO USERS (first_name, last_name, admin, email, password)
-VALUES ('Admin', 'Admin', true, 'yoga@studio.com', '$2a$10$.Hsa/ZjUVaHqi0tp9xieMeewrnZxrZ5pQRzddUXE/WjDu2ZThe6Iq'); 
+VALUES ('Admin', 'Admin', true, 'yoga@studio.com', '$2a$10$.Hsa/ZjUVaHqi0tp9xieMeewrnZxrZ5pQRzddUXE/WjDu2ZThe6Iq');
 

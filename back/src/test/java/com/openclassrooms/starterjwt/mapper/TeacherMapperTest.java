@@ -40,10 +40,9 @@ class TeacherMapperTest {
 
     @Test
     void testToEntityList() {
-        TeacherDto dto1 = new TeacherDto();
-        dto1.setId(1L);
-        TeacherDto dto2 = new TeacherDto();
-        dto2.setId(2L);
+        LocalDateTime now = LocalDateTime.now();
+        TeacherDto dto1 = new TeacherDto(1L, "Doe", "John", now, now);
+        TeacherDto dto2 = new TeacherDto(2L, "Smith", "Jane", now, now);
         List<TeacherDto> dtoList = new ArrayList<>();
         dtoList.add(dto1);
         dtoList.add(dto2);
@@ -57,10 +56,9 @@ class TeacherMapperTest {
 
     @Test
     void testToDtoList() {
-        Teacher entity1 = new Teacher();
-        entity1.setId(1L);
-        Teacher entity2 = new Teacher();
-        entity2.setId(2L);
+        LocalDateTime now = LocalDateTime.now();
+        Teacher entity1 = new Teacher(1L, "Doe", "John", now, now);
+        Teacher entity2 = new Teacher(2L, "Smith", "Jane", now, now);
         List<Teacher> entityList = new ArrayList<>();
         entityList.add(entity1);
         entityList.add(entity2);
@@ -70,5 +68,29 @@ class TeacherMapperTest {
         assertThat(dtoList).isNotNull().hasSize(2);
         assertThat(dtoList.get(0).getId()).isEqualTo(1L);
         assertThat(dtoList.get(1).getId()).isEqualTo(2L);
+    }
+
+    @Test
+    void testToEntityList_withNullList() {
+        List<Teacher> entityList = teacherMapper.toEntity((List<TeacherDto>) null);
+        assertThat(entityList).isNull();
+    }
+
+    @Test
+    void testToDtoList_withNullList() {
+        List<TeacherDto> dtoList = teacherMapper.toDto((List<Teacher>) null);
+        assertThat(dtoList).isNull();
+    }
+
+    @Test
+    void testToEntity_withNullDto() {
+        Teacher entity = teacherMapper.toEntity((TeacherDto) null);
+        assertThat(entity).isNull();
+    }
+
+    @Test
+    void testToDto_withNullEntity() {
+        TeacherDto dto = teacherMapper.toDto((Teacher) null);
+        assertThat(dto).isNull();
     }
 }

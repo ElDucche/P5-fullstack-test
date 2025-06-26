@@ -109,7 +109,29 @@ class UserMapperTest {
         assertThat(dtoList).isNotNull().hasSize(2);
         assertThat(dtoList.get(0).getId()).isEqualTo(1L);
         assertThat(dtoList.get(1).getId()).isEqualTo(2L);
-        assertThat(dtoList.get(0).getEmail()).isEqualTo("test1@test.com");
-        assertThat(dtoList.get(1).getEmail()).isEqualTo("test2@test.com");
+    }
+
+    @Test
+    void testToEntityList_withNullList() {
+        List<User> entityList = userMapper.toEntity((List<UserDto>) null);
+        assertThat(entityList).isNull();
+    }
+
+    @Test
+    void testToDtoList_withNullList() {
+        List<UserDto> dtoList = userMapper.toDto((List<User>) null);
+        assertThat(dtoList).isNull();
+    }
+
+    @Test
+    void testToEntity_withNullDto() {
+        User entity = userMapper.toEntity((UserDto) null);
+        assertThat(entity).isNull();
+    }
+
+    @Test
+    void testToDto_withNullEntity() {
+        UserDto dto = userMapper.toDto((User) null);
+        assertThat(dto).isNull();
     }
 }

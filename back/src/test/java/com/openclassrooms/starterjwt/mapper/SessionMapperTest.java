@@ -8,19 +8,17 @@ import com.openclassrooms.starterjwt.services.TeacherService;
 import com.openclassrooms.starterjwt.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class SessionMapperTest {
+class SessionMapperTest {
     @Mock
     private TeacherService teacherService;
     @Mock
@@ -97,5 +95,29 @@ public class SessionMapperTest {
 
         assertThat(dto.getTeacher_id()).isNull();
         assertThat(dto.getUsers()).isNotNull().isEmpty();
+    }
+
+    @Test
+    void testToEntityList_withNullList() {
+        List<Session> entityList = sessionMapper.toEntity((List<SessionDto>) null);
+        assertThat(entityList).isNull();
+    }
+
+    @Test
+    void testToDtoList_withNullList() {
+        List<SessionDto> dtoList = sessionMapper.toDto((List<Session>) null);
+        assertThat(dtoList).isNull();
+    }
+
+    @Test
+    void testToEntity_withNullDto() {
+        Session entity = sessionMapper.toEntity((SessionDto) null);
+        assertThat(entity).isNull();
+    }
+
+    @Test
+    void testToDto_withNullEntity() {
+        SessionDto dto = sessionMapper.toDto((Session) null);
+        assertThat(dto).isNull();
     }
 }
