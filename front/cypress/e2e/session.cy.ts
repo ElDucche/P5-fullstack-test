@@ -188,7 +188,7 @@ describe('Session spec ', () => {
 })
 
 describe('Session spec ', () => {
-    beforeEach(() => {
+    before(() => {
         cy.visit('/login')
         cy.intercept('GET', '/api/teacher', {
             body: [
@@ -275,6 +275,30 @@ describe('Session spec ', () => {
         cy.get('input[formControlName=email]').type("yoga@studio.com")
         cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
             })
+before(() => {
+  cy.intercept(
+            'GET',
+            '/api/session/1',
+            {
+          body: {
+              "id": 1,
+              "name": "Session de Test",
+              "date": "2025-06-15T09:00:00.000Z",
+              "description": "Description de la session de test.",
+              "teacher": {
+                "id": 1,
+                "lastName": "Dupont",
+                "firstName": "Jean",
+                "createdAt": "2025-05-04T10:00:00.000Z",
+                "updatedAt": "2025-05-04T10:00:00.000Z"
+              },
+              "users": [],
+              "createdAt": "2025-05-04T12:00:00.000Z",
+              "updatedAt": "2025-05-04T12:00:00.000Z"
+            }
+            }
+        )
+    })
     it('Session successfull, User not admin', () => {
         cy.url().should('include', '/sessions')
         cy.get('mat-card-header').should('not.contain', 'Create')
@@ -284,6 +308,28 @@ describe('Session spec ', () => {
         cy.get('.item').contains('Detail').click()
         cy.url().should('include', '/sessions/detail/1')
 
+        cy.intercept(
+            'GET',
+            '/api/session/1',
+            {
+          body: {
+              "id": 1,
+              "name": "Session de Test",
+              "date": "2025-06-15T09:00:00.000Z",
+              "description": "Description de la session de test.",
+              "teacher": {
+                "id": 1,
+                "lastName": "Dupont",
+                "firstName": "Jean",
+                "createdAt": "2025-05-04T10:00:00.000Z",
+                "updatedAt": "2025-05-04T10:00:00.000Z"
+              },
+              "users": [],
+              "createdAt": "2025-05-04T12:00:00.000Z",
+              "updatedAt": "2025-05-04T12:00:00.000Z"
+            }
+            }
+        )
         cy.get('mat-card-title').should('contain', 'Participate')
         cy.get('button').contains('Participate').click()
         cy.wait('@participateSession').should((xhr) => {
