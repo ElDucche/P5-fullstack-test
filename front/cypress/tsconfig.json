@@ -1,9 +1,19 @@
 {
-  "extends": "../tsconfig.json",
+  // "extends": "../tsconfig.json", // Supprimez ou commentez cette ligne
   "compilerOptions": {
-    "isolatedModules": false
+    // Ajoutez quelques options de base si nécessaire, ou laissez vide si les valeurs par défaut conviennent
+    "target": "es2018", // Ou une version appropriée
+    "lib": ["es2018", "dom"],
+    "esModuleInterop": true, // Souvent utile avec Cypress et Node
+    "strict": false, // Ou true si vous préférez
+    // --- Options spécifiques à Cypress ---
+    "types": ["cypress", "node"], // Inclut spécifiquement les types Cypress et Node
+    "isolatedModules": false, // Cypress peut nécessiter cela
+    "noEmit": true // On ne compile pas réellement les tests Cypress via tsc ici
   },
   "include": [
-    "../node_modules/cypress"
+    "../node_modules/cypress", // Pour les types globaux
+    "**/*.ts" // Inclut tous les fichiers .ts dans le dossier cypress et ses sous-dossiers
   ]
+  // Pas besoin d'exclude ici car on n'hérite plus
 }

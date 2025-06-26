@@ -10,7 +10,8 @@
       ],
       "parserOptions": {
         "project": [
-          "tsconfig.json"
+          
+          "./front/tsconfig.app.json" // Chemin vers le tsconfig spécifique à l'application
         ],
         "createDefaultProgram": true
       },
@@ -19,6 +20,7 @@
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
+        // ...existing rules...
         "@angular-eslint/directive-selector": [
           "error",
           {

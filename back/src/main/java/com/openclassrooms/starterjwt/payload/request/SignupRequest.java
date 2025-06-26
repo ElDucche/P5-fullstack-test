@@ -22,4 +22,18 @@ public class SignupRequest {
   @NotBlank
   @Size(min = 6, max = 40)
   private String password;
+
+  // Lombok génère déjà les getters/setters, mais on ajoute explicitement les méthodes attendues par le code existant :
+  public String getEmail() {
+      return email;
+  }
+  public String getFirstName() {
+      return firstName;
+  }
+  public String getLastName() {
+      return lastName;
+  }
+  public String getPassword() {
+      return password;
+  }
 }
