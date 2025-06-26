@@ -8,14 +8,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.openclassrooms.starterjwt.models.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
-@AllArgsConstructor
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
   private static final long serialVersionUID = 1L;
 
@@ -30,11 +33,21 @@ public class UserDetailsImpl implements UserDetails {
   private Boolean admin;
 
   @JsonIgnore
-  private String password;  
-  
-  public Collection<? extends GrantedAuthority> getAuthorities() {        
-      return new HashSet<GrantedAuthority>();
+  private String password;
+
+  public static UserDetailsImpl build(User user) {
+    return new UserDetailsImpl(
+        user.getId(),
+        user.getEmail(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.isAdmin(),
+        user.getPassword());
   }
+
+  public Collection<? extends GrantedAuthority> getAuthorities() {        
+        return new HashSet<>();
+    }
 
   @Override
   public boolean isAccountNonExpired() {
@@ -65,4 +78,9 @@ public class UserDetailsImpl implements UserDetails {
     UserDetailsImpl user = (UserDetailsImpl) o;
     return Objects.equals(id, user.id);
   } 
+  
+  @Override
+  public int hashCode() {
+        return Objects.hash(id);
+    }
 }

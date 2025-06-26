@@ -23,13 +23,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     User user = userRepository.findByEmail(username)
         .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + username));
 
-    return UserDetailsImpl
-            .builder()
+    // Utilisation du builder généré par Lombok (UserDetailsImpl.UserDetailsImplBuilder)
+    return UserDetailsImpl.builder()
             .id(user.getId())
             .username(user.getEmail())
             .lastName(user.getLastName())
             .firstName(user.getFirstName())
             .password(user.getPassword())
+            .admin(user.isAdmin())
             .build();
   }
 
