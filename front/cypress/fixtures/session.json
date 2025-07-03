@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "name": "Test Session",
+  "date": "2025-07-20T00:00:00.000Z",
+  "teacher_id": 1,
+  "description": "Description for test session",
+  "users": []
+}

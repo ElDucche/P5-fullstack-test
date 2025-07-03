@@ -99,51 +99,23 @@ describe('DetailComponent', () => {
   let teacherService: TeacherService;
   let sessionService: SessionService;
   let router: Router;
-  let snackBar: MatSnackBar;
-  let route: ActivatedRoute;
-
-  // Backup original window.history and restore after tests
-  const originalWindowHistory = window.history;
-  beforeAll(() => {
-    Object.defineProperty(window, 'history', {
-      value: mockWindowHistory
-    });
-  });
-
-  afterAll(() => {
-    Object.defineProperty(window, 'history', {
-      value: originalWindowHistory
-    });
-  });
+  let matSnackBar: MatSnackBar;
 
   beforeEach(async () => {
-    // Reset mocks
-    mockSessionApiService.detail.mockClear().mockReturnValue(of({ ...mockSession, users: [] })); // Reset with copy
-    mockSessionApiService.delete.mockClear().mockReturnValue(of({}));
-    mockSessionApiService.participate.mockClear().mockReturnValue(of(undefined));
-    mockSessionApiService.unParticipate.mockClear().mockReturnValue(of(undefined));
-    mockTeacherService.detail.mockClear().mockReturnValue(of({ ...mockTeacher })); // Reset with copy
-    mockRouter.navigate.mockClear();
-    mockMatSnackBar.open.mockClear();
-    mockWindowHistory.back.mockClear();
-    mockActivatedRoute.snapshot.paramMap.get.mockClear().mockReturnValue(mockSessionId);
-    (mockSessionService as any).sessionInformation = { ...mockSessionInformation }; // Reset session info
-
     await TestBed.configureTestingModule({
-      declarations: [DetailComponent],
       imports: [
         RouterTestingModule,
         HttpClientModule,
-        MatSnackBarModule,
-        ReactiveFormsModule, // Although no form, it might be needed by other imports indirectly or future use
-        NoopAnimationsModule, // Disable animations
-        // Import necessary Material modules used in the template
         MatCardModule,
         MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        MatSnackBarModule,
         MatButtonModule,
-        MatFormFieldModule, // If used
-        MatInputModule      // If used
+        NoopAnimationsModule
       ],
+      declarations: [DetailComponent],
       providers: [
         { provide: SessionService, useValue: mockSessionService },
         { provide: SessionApiService, useValue: mockSessionApiService },
@@ -151,125 +123,111 @@ describe('DetailComponent', () => {
         { provide: Router, useValue: mockRouter },
         { provide: MatSnackBar, useValue: mockMatSnackBar },
         { provide: ActivatedRoute, useValue: mockActivatedRoute }
-      ],
-    })
-      .compileComponents();
+      ]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DetailComponent);
     component = fixture.componentInstance;
-
-    // Inject services
     sessionApiService = TestBed.inject(SessionApiService);
     teacherService = TestBed.inject(TeacherService);
     sessionService = TestBed.inject(SessionService);
     router = TestBed.inject(Router);
-    snackBar = TestBed.inject(MatSnackBar);
-    route = TestBed.inject(ActivatedRoute);
+    matSnackBar = TestBed.inject(MatSnackBar);
 
-    // Initial detectChanges calls ngOnInit
-    // fixture.detectChanges(); // Moved inside tests where ngOnInit logic needs checking
+    // Replace the real window.history with our mock
+    Object.defineProperty(window, 'history', {
+      value: mockWindowHistory
+    });
+
+    fixture.detectChanges(); // Trigger ngOnInit
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks(); // Clean up mocks after each test
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize properties from route and sessionService in constructor', () => {
-    expect(route.snapshot.paramMap.get).toHaveBeenCalledWith('id');
-    expect(component.sessionId).toBe(mockSessionId);
-    expect(component.isAdmin).toBe(mockSessionInformation.admin);
-    expect(component.userId).toBe(mockSessionInformation.id.toString());
+  it('should fetch session and teacher details on init', () => {
+    expect(sessionApiService.detail).toHaveBeenCalledWith(mockSessionId);
+    expect(teacherService.detail).toHaveBeenCalledWith(mockTeacherId.toString());
+    expect(component.session).toEqual(mockSession);
+    expect(component.teacher).toEqual(mockTeacher);
   });
 
-  describe('ngOnInit & fetchSession', () => {
-    it('should call fetchSession on init', () => {
-      const fetchSessionSpy = jest.spyOn(component as any, 'fetchSession');
-      fixture.detectChanges(); // Trigger ngOnInit
-      expect(fetchSessionSpy).toHaveBeenCalled();
+  it('should call window.history.back() when back() is called', () => {
+    component.back();
+    expect(mockWindowHistory.back).toHaveBeenCalled();
+  });
+
+  describe('Admin actions', () => {
+    beforeEach(() => {
+      component.isAdmin = true;
+      fixture.detectChanges();
     });
 
-    it('should call sessionApiService.detail with sessionId', fakeAsync(() => {
-      fixture.detectChanges(); // Trigger ngOnInit -> fetchSession
-      tick(); // Allow observables to resolve
-      expect(sessionApiService.detail).toHaveBeenCalledWith(mockSessionId);
-    }));
-
-    it('should set session and call teacherService.detail on successful fetch', fakeAsync(() => {
-      const sessionData = { ...mockSession, users: [] };
-      mockSessionApiService.detail.mockReturnValue(of(sessionData));
-      fixture.detectChanges();
-      tick();
-
-      expect(component.session).toEqual(sessionData);
-      expect(teacherService.detail).toHaveBeenCalledWith(sessionData.teacher_id.toString());
-    }));
-
-    it('should set teacher on successful teacherService.detail', fakeAsync(() => {
-      const teacherData = { ...mockTeacher };
-      mockTeacherService.detail.mockReturnValue(of(teacherData));
-      fixture.detectChanges();
-      tick(); // Resolve sessionApiService.detail
-      tick(); // Resolve teacherService.detail
-
-      expect(component.teacher).toEqual(teacherData);
-    }));
-
-    it('should set isParticipate to true if user ID is in session users', fakeAsync(() => {
-      const sessionData = { ...mockSession, users: [mockUserId, 999] };
-      mockSessionApiService.detail.mockReturnValue(of(sessionData));
-      fixture.detectChanges();
-      tick();
-
-      expect(component.isParticipate).toBe(true);
-    }));
-
-    it('should set isParticipate to false if user ID is not in session users', fakeAsync(() => {
-      const sessionData = { ...mockSession, users: [998, 999] };
-      mockSessionApiService.detail.mockReturnValue(of(sessionData));
-      fixture.detectChanges();
-      tick();
-
-      expect(component.isParticipate).toBe(false);
-    }));
-
-  });
-
-  describe('back', () => {
-    it('should call window.history.back', () => {
-      component.back();
-      expect(mockWindowHistory.back).toHaveBeenCalled();
-    });
-  });
-
-  describe('delete', () => {
-    it('should call sessionApiService.delete with sessionId', () => {
+    it('should call delete service, show snackbar, and navigate on delete()', () => {
       component.delete();
       expect(sessionApiService.delete).toHaveBeenCalledWith(mockSessionId);
+      expect(matSnackBar.open).toHaveBeenCalledWith('Session deleted !', 'Close', { duration: 3000 });
+      expect(router.navigate).toHaveBeenCalledWith(['sessions']);
+    });
+  });
+
+  describe('User participation', () => {
+    beforeEach(() => {
+      component.isAdmin = false;
+      // Reset session to not include the user initially
+      mockSession.users = [];
+      component.isParticipate = false;
+      fixture.detectChanges();
     });
 
-    it('should show snackbar and navigate on successful delete', fakeAsync(() => {
-      component.delete();
-      tick(); // Resolve delete observable
+    it('should call participate, then fetchSession, and update the UI', fakeAsync(() => {
+      const participateButton = fixture.debugElement.nativeElement.querySelector('button[color="primary"]');
+      expect(participateButton.textContent).toContain('Participate');
 
-      expect(snackBar.open).toHaveBeenCalledWith('Session deleted !', 'Close', { duration: 3000 });
-      expect(router.navigate).toHaveBeenCalledWith(['sessions']);
+      // Mock the session state AFTER participation for the refresh call
+      const sessionAfterParticipate = { ...mockSession, users: [mockUserId] };
+      (sessionApiService.detail as jest.Mock).mockReturnValue(of(sessionAfterParticipate));
+
+      component.participate();
+      tick(); // Complete the participate call
+      fixture.detectChanges(); // Update the view with the new session data
+
+      expect(sessionApiService.participate).toHaveBeenCalledWith(mockSessionId, mockUserId.toString());
+      expect(sessionApiService.detail).toHaveBeenCalledTimes(2); // Initial + refresh
+      expect(component.isParticipate).toBe(true);
+
+      const unParticipateButton = fixture.debugElement.nativeElement.querySelector('button[color="warn"]');
+      expect(unParticipateButton.textContent).toContain('Do not participate');
     }));
 
-  });
+    it('should call unParticipate, then fetchSession, and update the UI', fakeAsync(() => {
+      // Set initial state to already participating
+      component.isParticipate = true;
+      fixture.detectChanges();
 
-  describe('participate', () => {
-    it('should call sessionApiService.participate with sessionId and userId', () => {
-      component.participate();
-      expect(sessionApiService.participate).toHaveBeenCalledWith(mockSessionId, mockUserId.toString());
-    });
+      const unParticipateButton = fixture.debugElement.nativeElement.querySelector('button[color="warn"]');
+      expect(unParticipateButton.textContent).toContain('Do not participate');
 
-  });
+      // Mock the session state AFTER un-participating for the refresh call
+      const sessionAfterUnParticipate = { ...mockSession, users: [] };
+      (sessionApiService.detail as jest.Mock).mockReturnValue(of(sessionAfterUnParticipate));
 
-  describe('unParticipate', () => {
-    it('should call sessionApiService.unParticipate with sessionId and userId', () => {
       component.unParticipate();
-      expect(sessionApiService.unParticipate).toHaveBeenCalledWith(mockSessionId, mockUserId.toString());
-    });
+      tick(); // Complete the unParticipate call
+      fixture.detectChanges(); // Update the view
 
+      expect(sessionApiService.unParticipate).toHaveBeenCalledWith(mockSessionId, mockUserId.toString());
+      expect(sessionApiService.detail).toHaveBeenCalledTimes(2); // Initial + refresh
+      expect(component.isParticipate).toBe(false);
+
+      const participateButton = fixture.debugElement.nativeElement.querySelector('button[color="primary"]');
+      expect(participateButton.textContent).toContain('Participate');
+    }));
   });
+
 });

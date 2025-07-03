@@ -182,4 +182,58 @@ describe('MeComponent', () => {
     });
 
   });
+
+  describe('DOM Interaction and Display', () => {
+    it('should display user name and email correctly', () => {
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('p')?.textContent).toContain('Name: Test USER');
+      expect(compiled.querySelector('p:nth-child(2)')?.textContent).toContain('Email: test@example.com');
+    });
+
+    it('should show admin-specific elements for an admin user', () => {
+      const adminUser: User = { id: 1, email: 'admin@test.com', lastName: 'Admin', firstName: 'Super', admin: true, password: '', createdAt: new Date(), updatedAt: new Date() };
+      mockUserService.getById.mockReturnValue(of(adminUser));
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('p.my2')?.textContent).toContain('You are admin');
+      expect(compiled.querySelector('button[color="warn"]')).toBeNull(); // Delete button should not be present
+    });
+
+    it('should show non-admin specific elements for a regular user', () => {
+      const regularUser: User = { id: 2, email: 'user@test.com', lastName: 'User', firstName: 'Regular', admin: false, password: '', createdAt: new Date(), updatedAt: new Date() };
+      mockUserService.getById.mockReturnValue(of(regularUser));
+      // Also update the session service mock to reflect the current user
+      mockSessionService.sessionInformation.id = 2;
+      mockSessionService.sessionInformation.admin = false;
+
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('p.my2')).toBeNull(); // Admin message should not be present
+      expect(compiled.querySelector('button[color="warn"]')).not.toBeNull(); // Delete button should be present
+    });
+
+    it('should call back() method when the back button is clicked', () => {
+      jest.spyOn(component, 'back');
+      fixture.detectChanges();
+      const backButton = fixture.nativeElement.querySelector('button[mat-icon-button]');
+      backButton.click();
+      expect(component.back).toHaveBeenCalled();
+    });
+
+    it('should call delete() method when the delete button is clicked', () => {
+      // Setup for a non-admin user so the button is visible
+      const regularUser: User = { id: 2, email: 'user@test.com', lastName: 'User', firstName: 'Regular', admin: false, password: '', createdAt: new Date(), updatedAt: new Date() };
+      mockUserService.getById.mockReturnValue(of(regularUser));
+      mockSessionService.sessionInformation.admin = false;
+      fixture.detectChanges();
+
+      jest.spyOn(component, 'delete');
+      const deleteButton = fixture.nativeElement.querySelector('button[color="warn"]');
+      deleteButton.click();
+      expect(component.delete).toHaveBeenCalled();
+    });
+  });
 });
