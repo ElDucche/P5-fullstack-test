@@ -30,7 +30,6 @@ describe('RegisterComponent', () => {
   let fixture: ComponentFixture<RegisterComponent>;
   let authService: AuthService;
   let router: Router;
-  let fb: FormBuilder;
 
   beforeEach(async () => {
     // Reset mocks
@@ -40,141 +39,137 @@ describe('RegisterComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
       imports: [
-        // Use NoopAnimationsModule for testing
-        NoopAnimationsModule,
         RouterTestingModule,
-        HttpClientModule, // Often needed by services
-        ReactiveFormsModule, // Essential for form group
+        HttpClientModule,
+        ReactiveFormsModule,
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule
+        MatInputModule,
+        NoopAnimationsModule
       ],
       providers: [
-        // Provide mocks for services
         { provide: AuthService, useValue: mockAuthService },
-        { provide: Router, useValue: mockRouter },
-        // FormBuilder is provided by ReactiveFormsModule
+        { provide: Router, useValue: mockRouter }
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
-    // Inject services/mocks
     authService = TestBed.inject(AuthService);
     router = TestBed.inject(Router);
-    fb = TestBed.inject(FormBuilder);
 
-    fixture.detectChanges(); // Trigger initial data binding and ngOnInit (if any)
+    fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy(); // Jest assertion
+    expect(component).toBeTruthy();
   });
 
-  it('should initialize the form with empty fields', () => {
-    expect(component.form.value).toEqual({ email: '', firstName: '', lastName: '', password: '' });
-  });
-
-  it('should initialize with onError=false', () => {
-    expect(component.onError).toBe(false);
-  });
-
-  describe('submit', () => {
-    const testEmail = 'test@example.com';
-    const testFirstName = 'Test';
-    const testLastName = 'User';
-    const testPassword = 'password123';
-    const registerRequest: RegisterRequest = {
-      email: testEmail,
-      firstName: testFirstName,
-      lastName: testLastName,
-      password: testPassword
-    };
-
-    beforeEach(() => {
-      // Set form values before each submit test
-      component.form.controls['email'].setValue(testEmail);
-      component.form.controls['firstName'].setValue(testFirstName);
-      component.form.controls['lastName'].setValue(testLastName);
-      component.form.controls['password'].setValue(testPassword);
+  describe('Form validation', () => {
+    it('should have an invalid form when empty', () => {
+      expect(component.form.valid).toBeFalsy();
     });
 
-    it('should call authService.register with form values', () => {
-      // Arrange: Mock register to return an observable
-      mockAuthService.register.mockReturnValue(of(undefined)); // Simulate success (API returns void)
+    it('should require email, firstName, lastName, and password', () => {
+      const email = component.form.get('email');
+      const firstName = component.form.get('firstName');
+      const lastName = component.form.get('lastName');
+      const password = component.form.get('password');
 
-      // Act
+      // Set one field and check if the form is still invalid
+      email?.setValue('test@test.com');
+      expect(component.form.valid).toBeFalsy();
+
+      firstName?.setValue('Test');
+      expect(component.form.valid).toBeFalsy();
+
+      lastName?.setValue('User');
+      expect(component.form.valid).toBeFalsy();
+
+      // All fields except password are set
+      password?.setValue('');
+      expect(password?.valid).toBeFalsy();
+      expect(component.form.valid).toBeFalsy();
+    });
+
+    it('should have a valid form when all fields are filled correctly', () => {
+      component.form.get('email')?.setValue('test@example.com');
+      component.form.get('firstName')?.setValue('Test');
+      component.form.get('lastName')?.setValue('User');
+      component.form.get('password')?.setValue('password123');
+      expect(component.form.valid).toBeTruthy();
+    });
+  });
+
+  describe('Form submission', () => {
+    beforeEach(() => {
+      // Fill the form to make it valid
+      component.form.get('email')?.setValue('test@example.com');
+      component.form.get('firstName')?.setValue('Test');
+      component.form.get('lastName')?.setValue('User');
+      component.form.get('password')?.setValue('password123');
+    });
+
+    it('should call authService.register on submit', () => {
+      const registerRequest: RegisterRequest = {
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        password: 'password123'
+      };
+      mockAuthService.register.mockReturnValue(of(undefined)); // Mock successful registration
+
       component.submit();
 
-      // Assert
       expect(authService.register).toHaveBeenCalledWith(registerRequest);
     });
 
     it('should navigate to /login on successful registration', () => {
-      // Arrange
-      mockAuthService.register.mockReturnValue(of(undefined)); // Simulate success
+      mockAuthService.register.mockReturnValue(of(undefined));
 
-      // Act
       component.submit();
 
-      // Assert
       expect(router.navigate).toHaveBeenCalledWith(['/login']);
-      expect(component.onError).toBe(false); // Ensure onError is not set
+      expect(component.onError).toBeFalsy();
     });
 
     it('should set onError to true on failed registration', () => {
-      // Arrange
-      const errorResponse = new Error('Registration failed');
-      mockAuthService.register.mockReturnValue(throwError(() => errorResponse)); // Simulate failure
+      mockAuthService.register.mockReturnValue(throwError(() => new Error('Registration failed')));
 
-      // Act
       component.submit();
 
-      // Assert
-      expect(component.onError).toBe(true);
-      expect(router.navigate).not.toHaveBeenCalled(); // Ensure navigate was not called
+      expect(component.onError).toBeTruthy();
+      expect(router.navigate).not.toHaveBeenCalled();
     });
   });
 
-  // Optional: Add tests for form validation
-  describe('Form Validation', () => {
-    it('should require email', () => {
-        const emailControl = component.form.controls['email'];
-        emailControl.setValue('');
-        expect(emailControl.valid).toBeFalsy();
-        expect(emailControl.hasError('required')).toBeTruthy();
+  describe('DOM Interaction', () => {
+    it('should disable the submit button when the form is invalid', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const submitButton = compiled.querySelector('button[type="submit"]') as HTMLButtonElement;
+      
+      expect(submitButton.disabled).toBeTruthy();
+
+      component.form.get('email')?.setValue('test@example.com');
+      component.form.get('firstName')?.setValue('Test');
+      component.form.get('lastName')?.setValue('User');
+      component.form.get('password')?.setValue('password123');
+      fixture.detectChanges();
+
+      expect(submitButton.disabled).toBeFalsy();
     });
 
-    it('should require a valid email format', () => {
-        const emailControl = component.form.controls['email'];
-        emailControl.setValue('not-an-email');
-        expect(emailControl.valid).toBeFalsy();
-        expect(emailControl.hasError('email')).toBeTruthy();
-    });
+    it('should display an error message if onError is true', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('.error')).toBeNull();
 
-     it('should require firstName', () => {
-        const firstNameControl = component.form.controls['firstName'];
-        firstNameControl.setValue('');
-        expect(firstNameControl.valid).toBeFalsy();
-        expect(firstNameControl.hasError('required')).toBeTruthy();
-    });
+      component.onError = true;
+      fixture.detectChanges();
 
-     it('should require lastName', () => {
-        const lastNameControl = component.form.controls['lastName'];
-        lastNameControl.setValue('');
-        expect(lastNameControl.valid).toBeFalsy();
-        expect(lastNameControl.hasError('required')).toBeTruthy();
+      const errorMessage = compiled.querySelector('.error');
+      expect(errorMessage).not.toBeNull();
+      expect(errorMessage?.textContent).toContain('An error occurred');
     });
-
-     it('should require password', () => {
-        const passwordControl = component.form.controls['password'];
-        passwordControl.setValue('');
-        expect(passwordControl.valid).toBeFalsy();
-        expect(passwordControl.hasError('required')).toBeTruthy();
-    });
-
-    // Add more validation tests if needed (min/max length)
   });
 });

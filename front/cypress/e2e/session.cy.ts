@@ -232,3 +232,17 @@ describe('Session spec', () => {
     });
   });
 });
+
+describe('AuthGuard', () => {
+  it('should redirect an unauthenticated user to /login when trying to access /sessions', () => {
+    cy.visit('/sessions');
+    cy.url().should('include', '/login');
+  });
+});
+
+describe('Not Found', () => {
+  it('should display the not found page for a non-existent URL', () => {
+    cy.visit('/a-route-that-does-not-exist');
+    cy.get('h1').contains('Page not found !').should('be.visible');
+  });
+});

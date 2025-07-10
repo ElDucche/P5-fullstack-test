@@ -21,7 +21,7 @@ describe('Register spec', () => {
         cy.visit('/register')
     
         cy.intercept('POST', '/api/auth/register', {
-            statusCode: 400,
+            statusCode: 500,
             body: {
                 message: 'Registration failed'
             },
@@ -52,5 +52,23 @@ describe('Register spec', () => {
         cy.get('input[formControlName=lastName]').type(" ")
 
         cy.get('button[type=submit]').should('be.disabled')
+    })
+    it('User credentials already exist', () => {
+        cy.visit('/register')
+    
+        cy.intercept('POST', '/api/auth/register', {
+            statusCode: 409,
+            body: {
+                message: 'User already exists'
+            },
+        })
+    
+        cy.get('input[formControlName=email]').type("test@yoga.mail")
+        cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+        cy.get('input[formControlName=firstName]').type("test")
+        cy.get('input[formControlName=lastName]').type("test")  
+        cy.get('button[type=submit]').click()
+        cy.get('.error').should('contain', 'An error occurred')
+        cy.url().should('include', '/register')
     })
 })

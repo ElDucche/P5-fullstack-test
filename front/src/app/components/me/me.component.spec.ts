@@ -162,7 +162,7 @@ describe('MeComponent', () => {
   describe('delete', () => {
     beforeEach(() => {
         // Ensure user is set before delete tests, as ngOnInit might not have run or failed
-        component.user = { id: 1, email: 'test@example.com', lastName: 'User', firstName: 'Test', admin: true, password: '', createdAt: new Date() };
+        component.user = { id: 1, email: 'test@example.com', lastName: 'User', firstName: 'Test', admin: true, password: '', createdAt: new Date(), updatedAt: new Date() };
         fixture.detectChanges(); // Needed if template relies on user data
     });
 

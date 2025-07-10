@@ -4,6 +4,8 @@ describe('Login spec', () => {
 
     cy.intercept('POST', '/api/auth/login', {
       body: {
+        token: 'un-token-jwt-simule',
+        type: 'bearer',
         id: 1,
         username: 'userName',
         firstName: 'firstName',
