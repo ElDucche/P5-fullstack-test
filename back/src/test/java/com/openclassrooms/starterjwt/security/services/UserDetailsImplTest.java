@@ -26,7 +26,14 @@ class UserDetailsImplTest {
 
     @Test
     void testBuild() {
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+        UserDetailsImpl userDetails = UserDetailsImpl.builder()
+                .id(user.getId())
+                .username(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .admin(user.isAdmin())
+                .password(user.getPassword())
+                .build();
 
         assertThat(userDetails.getId()).isEqualTo(1L);
         assertThat(userDetails.getUsername()).isEqualTo("test@test.com");
@@ -39,7 +46,14 @@ class UserDetailsImplTest {
     @Test
     void testGetters() {
         user.setAdmin(true);
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+        UserDetailsImpl userDetails = UserDetailsImpl.builder()
+                .id(user.getId())
+                .username(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .admin(user.isAdmin())
+                .password(user.getPassword())
+                .build();
 
         assertThat(userDetails.getId()).isEqualTo(1L);
         assertThat(userDetails.getUsername()).isEqualTo("test@test.com");
@@ -51,14 +65,28 @@ class UserDetailsImplTest {
 
     @Test
     void testAuthorities() {
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+        UserDetailsImpl userDetails = UserDetailsImpl.builder()
+                .id(user.getId())
+                .username(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .admin(user.isAdmin())
+                .password(user.getPassword())
+                .build();
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         assertThat(authorities).isNotNull().isEmpty();
     }
 
     @Test
     void testAccountStatus() {
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
+        UserDetailsImpl userDetails = UserDetailsImpl.builder()
+                .id(user.getId())
+                .username(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .admin(user.isAdmin())
+                .password(user.getPassword())
+                .build();
         assertThat(userDetails.isAccountNonExpired()).isTrue();
         assertThat(userDetails.isAccountNonLocked()).isTrue();
         assertThat(userDetails.isCredentialsNonExpired()).isTrue();
@@ -67,15 +95,36 @@ class UserDetailsImplTest {
 
     @Test
     void testEquals() {
-        UserDetailsImpl userDetails1 = UserDetailsImpl.build(user);
+        UserDetailsImpl userDetails1 = UserDetailsImpl.builder()
+                .id(user.getId())
+                .username(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .admin(user.isAdmin())
+                .password(user.getPassword())
+                .build();
 
         User user2 = new User();
         user2.setId(1L);
-        UserDetailsImpl userDetails2 = UserDetailsImpl.build(user2);
+        UserDetailsImpl userDetails2 = UserDetailsImpl.builder()
+                .id(user2.getId())
+                .username(user2.getEmail())
+                .firstName(user2.getFirstName())
+                .lastName(user2.getLastName())
+                .admin(user2.isAdmin())
+                .password(user2.getPassword())
+                .build();
 
         User user3 = new User();
         user3.setId(2L);
-        UserDetailsImpl userDetails3 = UserDetailsImpl.build(user3);
+        UserDetailsImpl userDetails3 = UserDetailsImpl.builder()
+                .id(user3.getId())
+                .username(user3.getEmail())
+                .firstName(user3.getFirstName())
+                .lastName(user3.getLastName())
+                .admin(user3.isAdmin())
+                .password(user3.getPassword())
+                .build();
 
         assertThat(userDetails1)
                 .isEqualTo(userDetails2) // same id
@@ -87,15 +136,36 @@ class UserDetailsImplTest {
 
     @Test
     void testHashCode() {
-        UserDetailsImpl userDetails1 = UserDetailsImpl.build(user);
+        UserDetailsImpl userDetails1 = UserDetailsImpl.builder()
+                .id(user.getId())
+                .username(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .admin(user.isAdmin())
+                .password(user.getPassword())
+                .build();
 
         User user2 = new User();
         user2.setId(1L);
-        UserDetailsImpl userDetails2 = UserDetailsImpl.build(user2);
+        UserDetailsImpl userDetails2 = UserDetailsImpl.builder()
+                .id(user2.getId())
+                .username(user2.getEmail())
+                .firstName(user2.getFirstName())
+                .lastName(user2.getLastName())
+                .admin(user2.isAdmin())
+                .password(user2.getPassword())
+                .build();
 
         User user3 = new User();
         user3.setId(2L);
-        UserDetailsImpl userDetails3 = UserDetailsImpl.build(user3);
+        UserDetailsImpl userDetails3 = UserDetailsImpl.builder()
+                .id(user3.getId())
+                .username(user3.getEmail())
+                .firstName(user3.getFirstName())
+                .lastName(user3.getLastName())
+                .admin(user3.isAdmin())
+                .password(user3.getPassword())
+                .build();
 
         assertThat(userDetails1).hasSameHashCodeAs(userDetails2);
         assertThat(userDetails1.hashCode()).isNotEqualTo(userDetails3.hashCode());

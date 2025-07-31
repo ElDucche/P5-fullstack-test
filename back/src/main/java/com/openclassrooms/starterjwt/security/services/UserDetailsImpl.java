@@ -8,17 +8,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.openclassrooms.starterjwt.models.User;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Builder
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
   private static final long serialVersionUID = 1L;
 
@@ -33,18 +28,8 @@ public class UserDetailsImpl implements UserDetails {
   private Boolean admin;
 
   @JsonIgnore
-  private String password;
-
-  public static UserDetailsImpl build(User user) {
-    return new UserDetailsImpl(
-        user.getId(),
-        user.getEmail(),
-        user.getFirstName(),
-        user.getLastName(),
-        user.isAdmin(),
-        user.getPassword());
-  }
-
+  private String password;  
+  
   public Collection<? extends GrantedAuthority> getAuthorities() {        
         return new HashSet<>();
     }
@@ -82,5 +67,58 @@ public class UserDetailsImpl implements UserDetails {
   @Override
   public int hashCode() {
         return Objects.hash(id);
+    }
+  
+  // Ajout des méthodes attendues par le code existant et les tests
+  public Long getId() {
+      return id;
+  }
+  public String getFirstName() {
+      return firstName;
+  }
+  public String getLastName() {
+      return lastName;
+  }
+  public Boolean isAdmin() {
+      return admin;
+  }
+  @Override
+  public String getPassword() {
+        return password;
+    }
+  @Override
+  public String getUsername() {
+      return username;
+  }
+  
+  // Builder manuel pour UserDetailsImpl
+    public static Builder builder() {
+        return new Builder();
+    }
+    public static class Builder {
+        private Long id;
+        private String username;
+        private String firstName;
+        private String lastName;
+        private Boolean admin;
+        private String password;
+        public Builder id(Long id) { this.id = id; return this; }
+        public Builder username(String username) { this.username = username; return this; }
+        public Builder firstName(String firstName) { this.firstName = firstName; return this; }
+        public Builder lastName(String lastName) { this.lastName = lastName; return this; }
+        public Builder admin(Boolean admin) { this.admin = admin; return this; }
+        public Builder password(String password) { this.password = password; return this; }
+        public UserDetailsImpl build() {
+            return new UserDetailsImpl(id, username, firstName, lastName, admin, password);
+        }
+    }
+    // Constructeur complet pour le builder manuel
+    public UserDetailsImpl(Long id, String username, String firstName, String lastName, Boolean admin, String password) {
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.admin = admin;
+        this.password = password;
     }
 }
