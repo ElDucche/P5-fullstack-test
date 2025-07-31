@@ -27,6 +27,8 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		<!-- Correction : Ajout explicite de spring-boot-starter-webmvc pour les tests d'intégration -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -126,35 +128,39 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.12</version>
-				<configuration>
-					<excludes>
-						<exclude>**/*Dto.*</exclude>
-						<exclude>**/models/*</exclude>
-					</excludes>
-				</configuration>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>
-						<phase>process-classes</phase>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
+						<configuration>
+							<excludes>
+								<exclude>com/openclassrooms/starterjwt/dto/**</exclude>
+							</excludes>
+						</configuration>
 					</execution>
-					<!-- attached to Maven test phase -->
 					<execution>
 						<id>report</id>
 						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<configuration>
+							<excludes>
+								<exclude>com/openclassrooms/starterjwt/dto/**</exclude>
+							</excludes>
+						</configuration>
 					</execution>
-
 					<execution>
 						<id>jacoco-check</id>
 						<goals>
 							<goal>check</goal>
 						</goals>
 						<configuration>
+							<excludes>
+								<exclude>com/openclassrooms/starterjwt/dto/**</exclude>
+							</excludes>
 							<rules>
 								<rule>
 									<element>PACKAGE</element>
@@ -169,7 +175,6 @@
 							</rules>
 						</configuration>
 					</execution>
-
 				</executions>
 			</plugin>
 			<plugin>

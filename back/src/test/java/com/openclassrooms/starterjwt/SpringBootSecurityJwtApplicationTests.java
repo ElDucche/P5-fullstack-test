@@ -1,20 +1,14 @@
 package com.openclassrooms.starterjwt;
 
-import com.openclassrooms.starterjwt.config.TestMappersConfig;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@ContextConfiguration(classes = {SpringBootSecurityJwtApplication.class, TestMappersConfig.class})
-@TestPropertySource(properties = {
-    "spring.datasource.url=jdbc:h2:mem:testdb",
-    "spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 class SpringBootSecurityJwtApplicationTests {
 

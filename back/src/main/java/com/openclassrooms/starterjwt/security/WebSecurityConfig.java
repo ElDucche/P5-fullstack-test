@@ -53,10 +53,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
-  // @Bean
-  // public HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
-  //   return new HandlerMappingIntrospector();
-  // }
+  @Bean
+  public HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
+    return new HandlerMappingIntrospector();
+  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
