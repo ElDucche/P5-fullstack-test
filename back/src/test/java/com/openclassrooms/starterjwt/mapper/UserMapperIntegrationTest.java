@@ -9,11 +9,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.openclassrooms.starterjwt.dto.UserDto;
 import com.openclassrooms.starterjwt.models.User;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class UserMapperIntegrationTest {
 
     @Autowired
@@ -101,12 +103,14 @@ class UserMapperIntegrationTest {
         userDto1.setEmail("test1@example.com");
         userDto1.setFirstName("John");
         userDto1.setLastName("Doe");
+        userDto1.setPassword("password123");
 
         UserDto userDto2 = new UserDto();
         userDto2.setId(2L);
         userDto2.setEmail("test2@example.com");
         userDto2.setFirstName("Jane");
         userDto2.setLastName("Smith");
+        userDto2.setPassword("password456");
 
         List<UserDto> userDtos = Arrays.asList(userDto1, userDto2);
 
