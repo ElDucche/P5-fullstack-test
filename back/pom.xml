@@ -128,39 +128,33 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.12</version>
+				<configuration>
+					<excludes>
+						<exclude>com/openclassrooms/starterjwt/**/*Dto.*</exclude>
+						<exclude>com/openclassrooms/starterjwt/dto/**</exclude>
+					</excludes>
+				</configuration>
 				<executions>
 					<execution>
-						<id>prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
-						<configuration>
-							<excludes>
-								<exclude>com/openclassrooms/starterjwt/dto/**</exclude>
-							</excludes>
-						</configuration>
 					</execution>
+					<!-- attached to Maven test phase -->
 					<execution>
 						<id>report</id>
 						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
-						<configuration>
-							<excludes>
-								<exclude>com/openclassrooms/starterjwt/dto/**</exclude>
-							</excludes>
-						</configuration>
 					</execution>
+
 					<execution>
 						<id>jacoco-check</id>
 						<goals>
 							<goal>check</goal>
 						</goals>
 						<configuration>
-							<excludes>
-								<exclude>com/openclassrooms/starterjwt/dto/**</exclude>
-							</excludes>
 							<rules>
 								<rule>
 									<element>PACKAGE</element>
@@ -175,6 +169,7 @@
 							</rules>
 						</configuration>
 					</execution>
+
 				</executions>
 			</plugin>
 			<plugin>
