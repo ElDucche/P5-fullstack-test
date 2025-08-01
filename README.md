@@ -219,12 +219,12 @@ npm run test -- --clearCache
 test/
 ├── java/
 │   └── com/openclassrooms/starterjwt/
-│       ├── controllers/        # Tests des contrôleurs
-│       ├── services/          # Tests des services
-│       ├── repository/        # Tests d'intégration
+│       ├── controllers/      # Tests des contrôleurs
+│       ├── services/         # Tests des services
+│       ├── repository/       # Tests d'intégration
 │       ├── mapper/           # Tests des mappers
 │       ├── security/         # Tests de sécurité
-│       └── dto/              # Tests des DTOs
+│       └── payload/          # Tests des Payloads
 └── resources/
     └── application.properties # Configuration de test
 ```
@@ -233,28 +233,12 @@ test/
 ```
 src/
 ├── app/
-│   ├── components/           # Tests des composants
+│   ├── components/          # Tests des composants
 │   ├── services/            # Tests des services
 │   └── guards/              # Tests des guards
 ├── cypress/
-│   ├── e2e/                # Tests E2E
-│   ├── fixtures/           # Données de test
-│   └── support/            # Utilitaires Cypress
+│   ├── e2e/                 # Tests E2E
+│   ├── fixtures/            # Données de test
+│   └── support/             # Utilitaires Cypress
 └── test-config.helper.ts    # Configuration des tests
 ```
-
-## 🎯 Bonnes Pratiques
-
-1. **Toujours lancer les tests avant de pusher** le code
-2. **Maintenir un minimum de 80% de couverture** de code
-3. **Écrire des tests pour chaque nouvelle fonctionnalité**
-4. **Utiliser des mocks appropriés** pour isoler les tests
-5. **Nommer les tests de manière descriptive**
-
-## 📞 Support
-
-En cas de problème avec les tests :
-1. Vérifier les prérequis et versions
-2. Consulter les logs d'erreur détaillés
-3. Nettoyer les caches et dépendances
-4. Vérifier la configuration des outils de test
